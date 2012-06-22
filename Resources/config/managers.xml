@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="cosm.feed_manager.class">Nass600\CosmBundle\Model\FeedManager</parameter>
+        <parameter key="cosm.connection_manager.class">Nass600\CosmBundle\Model\ConnectionManager</parameter>
+    </parameters>
+
+    <services>
+        <service id="cosm.connection_manager" class="%cosm.connection_manager.class%">
+        </service>
+        <service id="cosm.feed_manager" class="%cosm.feed_manager.class%">
+            <argument type="service" id="cosm.connection_manager" />
+        </service>
+    </services>
+
+</container>
