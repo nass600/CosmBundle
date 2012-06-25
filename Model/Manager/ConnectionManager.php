@@ -1,6 +1,9 @@
 <?php
 
-namespace Nass600\CosmBundle\Model;
+namespace Nass600\CosmBundle\Model\Manager;
+
+use \Exception;
+use Nass600\CosmBundle\Model\Feed;
 
 /**
  * Manages REST connection
@@ -16,60 +19,41 @@ class ConnectionManager
     const MISSING_PARAMS = 418;
     const MISSING_CURL = 500;
 
-    protected $format = "json";
-    protected $apiKey;
-    protected $feedId;
     protected $header;
     protected $baseUrl = "http://api.cosm.com/v2";
-    protected $datastreams;
 
     /**
      * Builds the web service url
      *
+     * @param Feed $feed
+     *
      * @return string
      * @throws Exception
      */
-    public function buildUrl()
+    public function buildUrl(Feed $feed)
     {
-        if (null == $this->apiKey || null == $this->feedId) {
-            throw Exception("You must set the feed Id and API key", 500);
+        if (null == $feed->getApiKey() || null == $feed->getFeedId()) {
+            throw new Exception("You must set the feed Id and API key", 500);
         }
+
+        $this->setHeader(array("X-PachubeApiKey: {$feed->getApiKey()}"));
+
+        $url = implode('/', array($this->baseUrl, "feeds", "{$feed->getFeedId()}.{$feed->getFormat()}"));
 
         // If datastreams set
-        if (count($this->datastreams) > 0) {
-            $datastreams = implode(',', $this->datastreams);
-            return implode('/', array(
-                $this->baseUrl,
-                "feeds",
-                $this->getFeedId() . ".$this->format?datastreams={$datastreams}"
-            ));
+        if (count($feed->getDatastreams()) > 0) {
+            $datastreams = implode(',', $feed->getDatastreams());
+
+            return "$url?datastreams={$datastreams}";
         }
 
-        return implode('/', array($this->baseUrl, "feeds", $this->getFeedId()));
-    }
-
-    public function getFormat()
-    {
-        return $this->format;
-    }
-
-    public function setFormat($format)
-    {
-        $this->format = $format;
-    }
-
-    public function getDatastreams()
-    {
-        return $this->datastreams;
-    }
-
-    public function setDatastreams(array $datastreams)
-    {
-        $this->datastreams = $datastreams;
+        return $url;
     }
 
     /**
-     * get headers
+     * Get headers
+     * 
+     * @return mixed
      */
     public function getHeader()
     {
@@ -77,9 +61,9 @@ class ConnectionManager
     }
 
     /**
-     * set headers
+     * Set headers
      *
-     * @param string $headers
+     * @param array $headers
      */
     protected function setHeader(array $headers)
     {
@@ -87,52 +71,17 @@ class ConnectionManager
     }
 
     /**
-     * get apiKey
-     */
-    public function getApiKey()
-    {
-        return $this->apiKey;
-    }
-
-    /**
-     * set apiKey
-     *
-     * @param string $apiKey
-     */
-    public function setApiKey($apiKey)
-    {
-        $this->apiKey = $apiKey;
-        $this->setHeader(array("X-PachubeApiKey: $apiKey"));
-    }
-
-    /**
-     * get feedId
-     */
-    public function getFeedId()
-    {
-        return $this->feedId;
-    }
-
-    /**
-     * set feedId
-     *
-     * @param string $feedId
-     */
-    public function setFeedId($feedId)
-    {
-        $this->feedId = $feedId;
-    }
-
-    /**
      * Create GET request to Cosm for retrieving a feed
+     *
+     * @param Feed $feed
      *
      * @return response
      * @throw Exception
      */
-    public function getRequest()
+    public function getRequest(Feed $feed)
     {
         try {
-            $url = $this->buildUrl();
+            $url = $this->buildUrl($feed);
         }
         catch(Exception $e) {
             throw $e;
@@ -158,19 +107,22 @@ class ConnectionManager
         elseif (function_exists('file_get_contents') && ini_get('allow_url_fopen'))
             return $this->get($url);
         else
-            $this->exceptionHandler(Connection::MISSING_CURL);
+            $this->exceptionHandler(self::MISSING_CURL);
     }
 
     /**
      * Create GET request to Cosm for creating a feed
      *
+     * @param Feed $feed
+     * @param $eeml
+     *
      * @return response
      * @throw Exception
      */
-    public function createRequest()
+    public function createRequest(Feed $feed, $eeml)
     {
         try {
-            $url = $this->buildUrl();
+            $url = $this->buildUrl($feed);
         }
         catch(Exception $e) {
             throw $e;
@@ -192,20 +144,21 @@ class ConnectionManager
             return $response['status']['http_code'];
         }
         else
-            $this->exceptionHandler(Connection::MISSING_CURL);
+            $this->exceptionHandler(self::MISSING_CURL);
     }
 
     /**
      * Create PUT request to Cosm for adding new feed
      *
-     * @param string url
+     * @param Feed $feed
      * @param string data
+     *
      * @return response
      */
-    public function putRequest($data)
+    public function putRequest(Feed $feed, $data)
     {
         try {
-            $url = $this->buildUrl();
+            $url = $this->buildUrl($feed);
         }
         catch(Exception $e) {
             throw $e;
@@ -226,7 +179,7 @@ class ConnectionManager
                 CURLOPT_PUT            => true,
             );
 
-            $response = $this->curlPut($options);
+            $response = $this->curl($options);
             fclose($putData);
 
             return $response['status']['http_code'];
@@ -234,20 +187,20 @@ class ConnectionManager
         elseif (function_exists('file_put_contents') && ini_get('allow_url_fopen'))
             return $this->put($url, $data);
         else
-            $this->exceptionHandler(Connection::MISSING_CURL);
+            $this->exceptionHandler(self::MISSING_CURL);
     }
 
     /**
      * Create DELETE request to Cosm for removing a feed
      *
-     * @param string url
-     * @param string data
+     * @param Feed $feed
+     *
      * @return response
      */
-    public function deleteRequest()
+    public function deleteRequest(Feed $feed)
     {
         try {
-            $url = $this->buildUrl();
+            $url = $this->buildUrl($feed);
         }
         catch(Exception $e) {
             throw $e;
@@ -266,14 +219,14 @@ class ConnectionManager
             return $response['status']['http_code'];
         }
         else
-            $this->exceptionHandler(Connection::MISSING_CURL);
+            $this->exceptionHandler(self::MISSING_CURL);
     }
 
     /**
      * cURL main function
      *
-     * @param string url
-     * @param bool authentication
+     * @param array $options
+     *
      * @return response
      */
     private function curl(array $options)

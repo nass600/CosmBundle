@@ -1,10 +1,10 @@
 <?php
-namespace Nass600\CosmBundle\Model;
+namespace Nass600\CosmBundle\Model\Manager;
 
-use Nass600\CosmBundle\Model\ConnectionManager;
+use Nass600\CosmBundle\Model\Manager\ConnectionManager;
+use Nass600\CosmBundle\Model\Feed;
 use Doctrine\ORM\EntityManager;
-use Ideup\PachubeBundle\Entity\Pachube;
-use Ideup\PachubeBundle\Formatter\Formatter;
+use Nass600\CosmBundle\Model\DataTransformer\ResponseToArrayTransformer;
 
 /**
  * FeedManager
@@ -31,14 +31,19 @@ class FeedManager
      * @param string $apiVersion
      * @param string $apiKey
      * @param integer $feedId
+     *
+     * @return array
      */
     public function readFeed($feedId, $apiKey)
     {
-        $this->connManager->setFeedId($feedId);
-        $this->connManager->setApiKey($apiKey);
-        $this->connManager->setDatastreams(array(1));
+        $feed = new Feed();
+        $feed->setFeedId($feedId);
+        $feed->setApiKey($apiKey);
+        $feed->setDatastreams(array(1));
+        $feed->setFormat('json');
 
-        $response = json_decode($this->connManager->getRequest());
+        $response = ResponseToArrayTransformer::transform($this->connManager->getRequest($feed),
+            $feed->getFormat());
 
         echo "<pre>";
         var_dump($response);

@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Nass600\CosmBundle\Model\ConnectionManager;
+use Nass600\CosmBundle\Model\Manager\ConnectionManager;
 
 /**
  * ReadFeedCommand
