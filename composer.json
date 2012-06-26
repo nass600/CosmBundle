@@ -10,7 +10,7 @@
             "name":     "Ignacio Velazquez",
             "email":    "ivelazquez85@gmail.com",
             "homepage": "http://ignaciovelazquez.es"
-        },
+        }
     ],
     "require":      {
         "php":              ">=5.3.0",
