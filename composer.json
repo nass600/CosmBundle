@@ -1,7 +1,7 @@
 {
     "name":         "nass600/cosm-bundle",
     "description":  "This bundle provides an integration with Cosm API",
-    "keywords":     ["feed", "cosm"],
+    "keywords":     ["feed", "cosm", "symfony2", "bundle"],
     "homepage":     "https://github.com/nass600/CosmBundle",
     "type":         "symfony-bundle",
     "license":      "GNU",
