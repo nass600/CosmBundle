@@ -43,6 +43,7 @@ Run the vendors script:
 Add the Nass600 namespace to your `app/autoload.php`:
 
 ``` php
+<?php
     // app/autoload.php
     $loader->registerNamespaces(array(
         // your other namespaces
@@ -53,6 +54,7 @@ Add the Nass600 namespace to your `app/autoload.php`:
 Add CosmBundle to your `app/AppKernel.php`:
 
 ``` php
+<?php
     // app/AppKernel.php
     public function registerBundles()
     {
@@ -77,6 +79,7 @@ Add this line to your project's composer.json:
 Add CosmBundle to your `app/AppKernel.php`:
 
 ``` php
+<?php
     // app/AppKernel.php
     public function registerBundles()
     {
