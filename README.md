@@ -22,32 +22,38 @@ For more information about the service, please visit: https://cosm.com
 Installation
 ------------
 
+#### On Symfony 2.0.x:
+
 Add CosmBundle to your vendor/bundles/ directory.
 
 Add the following lines in your ``deps`` file:
 
+```
     [Nass600CosmBundle]
       git =https://github.com/nass600/CosmBundle.git
       target=/bundles/Nass600/CosmBundle
-      version=master
+```
 
 Run the vendors script:
 
-    ./bin/vendors install
+``` bash
+    ./bin/vendors update
+```
 
-Add the Ideup namespace to your `app/autoload.php`:
+Add the Nass600 namespace to your `app/autoload.php`:
 
+``` php
     // app/autoload.php
     $loader->registerNamespaces(array(
         // your other namespaces
         'Nass600' => __DIR__.'/../vendor/bundles',
     );
+```
 
+Add CosmBundle to your `app/AppKernel.php`:
 
-Add PachubeBundle to your `app/AppKernel.php`:
-
+``` php
     // app/AppKernel.php
-
     public function registerBundles()
     {
         return array(
@@ -55,3 +61,28 @@ Add PachubeBundle to your `app/AppKernel.php`:
             new Nass600\CosmBundle\Nass600CosmBundle(),
         );
     }
+```
+
+#### On Symfony 2.1.x:
+
+Add this line to your project's composer.json:
+
+``` json
+    "require": {
+        // your other packages
+        "nass600/cosm-bundle": "dev-master"
+    },
+```
+
+Add CosmBundle to your `app/AppKernel.php`:
+
+``` php
+    // app/AppKernel.php
+    public function registerBundles()
+    {
+        return array(
+            // ...
+            new Nass600\CosmBundle\Nass600CosmBundle(),
+        );
+    }
+```
